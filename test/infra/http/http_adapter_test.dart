@@ -1,4 +1,6 @@
 // Packages:
+import 'dart:convert';
+
 import 'package:http/http.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,7 +24,7 @@ class HttpAdapter {
       'content-type': 'application/json',
       'accept': 'application/json',
     };
-    await client.post(Uri.parse(url), headers: headers);
+    await client.post(Uri.parse(url), headers: headers, body: jsonEncode(body));
   }
 }
 
@@ -45,12 +47,20 @@ void main() {
 
   group('Post', () {
     test('Should call post with correct values', () async {
-      when(client.post(Uri.parse(url), headers: headers))
-          .thenAnswer((_) async => MockResponse());
+      when(client.post(
+        Uri.parse(url),
+        headers: anyNamed('headers'),
+        body: anyNamed('body'),
+      )).thenAnswer((_) async => MockResponse());
 
-      await sut.request(url: url, method: 'post');
+      await sut
+          .request(url: url, method: 'post', body: {'any_key': 'any_value'});
 
-      verify(client.post(Uri.parse(url), headers: headers));
+      verify(client.post(
+        Uri.parse(url),
+        headers: headers,
+        body: '{"any_key":"any_value"}',
+      ));
     });
   });
 }
