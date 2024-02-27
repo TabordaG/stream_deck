@@ -37,7 +37,10 @@ void main() {
       url: url,
       method: 'post',
       body: anyNamed('body'),
-    )).thenAnswer((_) => Future.value());
+    )).thenAnswer((_) async => {
+          'accessToken': faker.guid.guid(),
+          'name': faker.person.name(),
+        });
 
     await sut.auth(params);
 
@@ -98,5 +101,21 @@ void main() {
     final future = sut.auth(params);
 
     expect(future, throwsA(DomainError.invalidCredentials));
+  });
+
+  test('Should throw an Account if HttpClient returns 200', () async {
+    final accessToken = faker.guid.guid();
+    when(httpClientMock.request(
+      url: anyNamed('url'),
+      method: anyNamed('method'),
+      body: anyNamed('body'),
+    )).thenAnswer((_) async => {
+          'accessToken': accessToken,
+          'name': faker.person.name(),
+        });
+
+    final account = await sut.auth(params);
+
+    expect(account.token, accessToken);
   });
 }
