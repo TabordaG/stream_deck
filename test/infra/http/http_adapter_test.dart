@@ -1,5 +1,5 @@
 // Packages:
-import 'dart:io';
+import 'package:http/http.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -9,7 +9,7 @@ import 'package:mockito/mockito.dart';
 import 'http_adapter_test.mocks.dart';
 
 class HttpAdapter {
-  final MockHttpClient client;
+  final MockClient client;
 
   HttpAdapter(this.client);
 
@@ -18,27 +18,32 @@ class HttpAdapter {
     required String method,
     Map? body,
   }) async {
-    await client.post(url, null, null);
+    final headers = {
+      'content-type': 'application/json',
+      'accept': 'application/json',
+    };
+    await client.post(Uri.parse(url), headers: headers);
   }
 }
 
-@GenerateMocks([HttpClient, HttpClientRequest, HttpClientResponse])
+@GenerateMocks([Client, Request, Response])
 void main() {
   group('Post', () {
     test('Should call post with correct values', () async {
-      final client = MockHttpClient();
+      final client = MockClient();
       final sut = HttpAdapter(client);
       final url = faker.internet.httpUrl();
+      final headers = {
+        'content-type': 'application/json',
+        'accept': 'application/json',
+      };
 
-      when(client.post(
-        url,
-        null,
-        null,
-      )).thenAnswer((_) async => MockHttpClientRequest());
+      when(client.post(Uri.parse(url), headers: headers))
+          .thenAnswer((_) async => MockResponse());
 
       await sut.request(url: url, method: 'post');
 
-      verify(client.post(url, null, null));
+      verify(client.post(Uri.parse(url), headers: headers));
     });
   });
 }
