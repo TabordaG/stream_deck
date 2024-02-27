@@ -22,11 +22,14 @@ void main() {
   late RemoteAuthentication sut;
   late MockHttpClientProject httpClientMock;
   late String url;
+  late AuthenticationParams params;
 
   setUp(() {
     httpClientMock = MockHttpClientProject();
     url = faker.internet.httpUrl();
     sut = RemoteAuthentication(httpClient: httpClientMock, url: url);
+    params = AuthenticationParams(
+        email: faker.internet.email(), secret: faker.internet.password());
   });
 
   test('Should call HttpClient with corrent values', () async {
@@ -36,8 +39,6 @@ void main() {
       body: anyNamed('body'),
     )).thenAnswer((_) => Future.value());
 
-    final params = AuthenticationParams(
-        email: faker.internet.email(), secret: faker.internet.password());
     await sut.auth(params);
 
     verify(httpClientMock.request(
@@ -57,8 +58,6 @@ void main() {
       body: anyNamed('body'),
     )).thenThrow(HttpError.badRequest);
 
-    final params = AuthenticationParams(
-        email: faker.internet.email(), secret: faker.internet.password());
     final future = sut.auth(params);
 
     expect(future, throwsA(DomainError.unexpected));
