@@ -1,4 +1,8 @@
+// Domain Layer:
+import '../../domain/helpers/helpers.dart';
 import '../../domain/usecases/usecases.dart';
+
+// Data Layer:
 import '../http/http.dart';
 
 class RemoteAuthentication {
@@ -8,11 +12,15 @@ class RemoteAuthentication {
   RemoteAuthentication({required this.httpClient, required this.url});
 
   Future<void> auth(AuthenticationParams params) async {
-    await httpClient.request(
-      url: url,
-      method: 'post',
-      body: RemoteAuthenticationParams.fromDomain(params).toJson(),
-    );
+    try {
+      await httpClient.request(
+        url: url,
+        method: 'post',
+        body: RemoteAuthenticationParams.fromDomain(params).toJson(),
+      );
+    } on HttpError {
+      throw DomainError.unexpected;
+    }
   }
 }
 

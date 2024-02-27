@@ -6,9 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 // Data Layer:
 import 'package:stream_deck/data/http/http.dart';
-import 'package:stream_deck/data/models/models.dart';
+import 'package:stream_deck/data/usecases/usecases.dart';
 
 // Domain Layer:
+import 'package:stream_deck/domain/helpers/helpers.dart';
 import 'package:stream_deck/domain/usecases/usecases.dart';
 
 // Generated file:
@@ -32,6 +33,7 @@ void main() {
     when(httpClientMock.request(
       url: url,
       method: 'post',
+      body: anyNamed('body'),
     )).thenAnswer((_) => Future.value());
 
     final params = AuthenticationParams(
@@ -46,5 +48,19 @@ void main() {
         'password': params.secret,
       },
     ));
+  });
+
+  test('Should throw UnexpectedError if HttpClient returns 400', () async {
+    when(httpClientMock.request(
+      url: anyNamed('url'),
+      method: anyNamed('method'),
+      body: anyNamed('body'),
+    )).thenThrow(HttpError.badRequest);
+
+    final params = AuthenticationParams(
+        email: faker.internet.email(), secret: faker.internet.password());
+    final future = sut.auth(params);
+
+    expect(future, throwsA(DomainError.unexpected));
   });
 }
