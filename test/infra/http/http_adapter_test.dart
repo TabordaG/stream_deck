@@ -28,16 +28,23 @@ class HttpAdapter {
 
 @GenerateMocks([Client, Request, Response])
 void main() {
+  late MockClient client;
+  late HttpAdapter sut;
+  late String url;
+  late Map<String, String> headers;
+
+  setUp(() {
+    client = MockClient();
+    sut = HttpAdapter(client);
+    url = faker.internet.httpUrl();
+    headers = {
+      'content-type': 'application/json',
+      'accept': 'application/json',
+    };
+  });
+
   group('Post', () {
     test('Should call post with correct values', () async {
-      final client = MockClient();
-      final sut = HttpAdapter(client);
-      final url = faker.internet.httpUrl();
-      final headers = {
-        'content-type': 'application/json',
-        'accept': 'application/json',
-      };
-
       when(client.post(Uri.parse(url), headers: headers))
           .thenAnswer((_) async => MockResponse());
 
