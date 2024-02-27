@@ -1,3 +1,6 @@
+// Data Layer:
+import '../http/http.dart';
+
 // Domain Layer:
 import '../../domain/entities/entities.dart';
 
@@ -8,7 +11,7 @@ class RemoteAccountEntity {
 
   factory RemoteAccountEntity.fromJson(Map json) {
     if (!json.containsKey('accessToken')) {
-      throw Exception();
+      throw HttpError.invalidData;
     }
     return RemoteAccountEntity(json['accessToken']);
   }
