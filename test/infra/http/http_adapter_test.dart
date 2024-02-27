@@ -6,16 +6,18 @@ import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:stream_deck/data/http/http.dart';
 
 // Generated file:
 import 'http_adapter_test.mocks.dart';
 
-class HttpAdapter {
+class HttpAdapter implements HttpClientProject {
   final MockClient client;
 
   HttpAdapter(this.client);
 
-  Future<void> request({
+  @override
+  Future<Map> request({
     required String url,
     required String method,
     Map? body,
@@ -24,15 +26,17 @@ class HttpAdapter {
       'content-type': 'application/json',
       'accept': 'application/json',
     };
-    await client.post(
+    final response = await client.post(
       Uri.parse(url),
       headers: headers,
       body: body != null ? jsonEncode(body) : null,
     );
+
+    return jsonDecode(response.body);
   }
 }
 
-@GenerateMocks([Client, Request, Response])
+@GenerateMocks([Client])
 void main() {
   late MockClient client;
   late HttpAdapter sut;
@@ -55,7 +59,7 @@ void main() {
         Uri.parse(url),
         headers: anyNamed('headers'),
         body: anyNamed('body'),
-      )).thenAnswer((_) async => MockResponse());
+      )).thenAnswer((_) async => Response('{"any_key":"any_value"}', 200));
 
       await sut
           .request(url: url, method: 'post', body: {'any_key': 'any_value'});
@@ -71,7 +75,7 @@ void main() {
       when(client.post(
         any,
         headers: anyNamed('headers'),
-      )).thenAnswer((_) async => MockResponse());
+      )).thenAnswer((_) async => Response('{"any_key":"any_value"}', 200));
 
       await sut.request(url: url, method: 'post');
 
@@ -79,6 +83,17 @@ void main() {
         Uri.parse(url),
         headers: headers,
       ));
+    });
+
+    test('Should return data if post returns 200', () async {
+      when(client.post(
+        any,
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async => Response('{"any_key":"any_value"}', 200));
+
+      final response = await sut.request(url: url, method: 'post');
+
+      expect(response, {'any_key': 'any_value'});
     });
   });
 }
