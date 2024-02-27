@@ -1,38 +1,18 @@
+// Packages:
 import 'package:faker/faker.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+// Data Layer:
+import 'package:stream_deck/data/http/http.dart';
+import 'package:stream_deck/data/models/models.dart';
+
+// Domain Layer:
 import 'package:stream_deck/domain/usecases/usecases.dart';
 
+// Generated file:
 import 'remote_authentication_test.mocks.dart';
-
-class RemoteAuthentication {
-  final HttpClientProject httpClient;
-  final String url;
-
-  RemoteAuthentication({required this.httpClient, required this.url});
-
-  Future<void> auth(AuthenticationParams params) async {
-    final body = {
-      'email': params.email,
-      'password': params.secret,
-    };
-    await httpClient.request(
-      url: url,
-      method: 'post',
-      body: body,
-    );
-  }
-}
-
-abstract class HttpClientProject {
-  Future<void> request({
-    required String url,
-    required String method,
-    Map body,
-  });
-}
 
 // Generate a MockClient using the Mockito package.
 // Create new instances of this class in each test.
