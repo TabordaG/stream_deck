@@ -22,12 +22,16 @@ class HttpAdapter implements HttpClientProject {
     };
 
     var response = Response('', 500);
-    if (method == 'post') {
-      response = await client.post(
-        Uri.parse(url),
-        headers: headers,
-        body: body != null ? jsonEncode(body) : null,
-      );
+    try {
+      if (method == 'post') {
+        response = await client.post(
+          Uri.parse(url),
+          headers: headers,
+          body: body != null ? jsonEncode(body) : null,
+        );
+      }
+    } catch (error) {
+      throw HttpError.serverError;
     }
     return _handleResponse(response);
   }
