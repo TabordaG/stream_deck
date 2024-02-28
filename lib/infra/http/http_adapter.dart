@@ -25,10 +25,14 @@ class HttpAdapter implements HttpClientProject {
       headers: headers,
       body: body != null ? jsonEncode(body) : null,
     );
+    return _handleResponse(response);
+  }
 
+  Map? _handleResponse(Response response) {
     if (response.statusCode == 200) {
       return response.body.isEmpty ? null : jsonDecode(response.body);
+    } else {
+      return null;
     }
-    return null;
   }
 }
