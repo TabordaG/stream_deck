@@ -17,7 +17,7 @@ class HttpAdapter implements HttpClientProject {
   HttpAdapter(this.client);
 
   @override
-  Future<Map> request({
+  Future<Map?> request({
     required String url,
     required String method,
     Map? body,
@@ -31,7 +31,7 @@ class HttpAdapter implements HttpClientProject {
       headers: headers,
       body: body != null ? jsonEncode(body) : null,
     );
-    return response.body.isEmpty ? {} : jsonDecode(response.body);
+    return response.body.isEmpty ? null : jsonDecode(response.body);
   }
 }
 
@@ -102,7 +102,15 @@ void main() {
 
       final response = await sut.request(url: url, method: 'post');
 
-      expect(response, {});
+      expect(response, null);
+    });
+
+    test('Should return null if post returns 204', () async {
+      mockResponse(204, body: '');
+
+      final response = await sut.request(url: url, method: 'post');
+
+      expect(response, null);
     });
   });
 }
