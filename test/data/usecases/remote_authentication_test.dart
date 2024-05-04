@@ -50,7 +50,7 @@ void main() {
     mockHttpData(mockValidData());
   });
 
-  test('Should call HttpClient with corrent values', () async {
+  test('Should call HttpClient with current values', () async {
     await sut.auth(params);
 
     verify(httpClientMock.request(
